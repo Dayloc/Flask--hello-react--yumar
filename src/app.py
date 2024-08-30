@@ -10,6 +10,8 @@ from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from api.models import Post
+from api.models import User
 
 # from models import Person
 
@@ -66,7 +68,32 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+
 # Crear un nuevo post
+@app.route('/users/getUser', methods=['GET'])
+def handle_get_user():
+    try:
+        # Obtener el ID del usuario desde los parámetros de consulta
+        user_id = request.args.get('id', type=int)
+
+        # Verificar si el ID del usuario fue proporcionado
+        if user_id is None:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Buscar el usuario en la base de datos por ID
+        user = User.query.get(user_id)
+
+        # Verificar si el usuario existe
+        if user is None:
+            return jsonify({"error": "User not found"}), 404
+
+        # Devolver los datos del usuario en formato JSON
+        return jsonify(user.serialize()), 200
+
+    except Exception as e:
+        # En caso de un error, devolver un mensaje de error y un código 500
+        return jsonify({"error": str(e)}), 500
+ 
 @app.route('/posts', methods=['POST'])
 def create_post():
     data = request.get_json()
