@@ -66,7 +66,51 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+# Crear un nuevo post
+@app.route('/posts', methods=['POST'])
+def create_post():
+    data = request.get_json()
+    new_post = Post(title=data['title'], content=data['content'], user_id=data['user_id'])
+    db.session.add(new_post)
+    db.session.commit()
+    return jsonify(new_post.serialize()), 201
 
+# Obtener todos los posts
+@app.route('/posts', methods=['GET'])
+def get_posts():
+    posts = Post.query.all()
+    return jsonify([post.serialize() for post in posts]), 200
+
+# Obtener un post por ID
+@app.route('/posts/<int:post_id>', methods=['GET'])
+def get_post(post_id):
+    post = Post.query.get(post_id)
+    if post is None:
+        return jsonify({"error": "Post not found"}), 404
+    return jsonify(post.serialize()), 200
+
+# Actualizar un post por ID
+@app.route('/posts/<int:post_id>', methods=['PUT'])
+def update_post(post_id):
+    post = Post.query.get(post_id)
+    if post is None:
+        return jsonify({"error": "Post not found"}), 404
+    data = request.get_json()
+    post.title = data.get('title', post.title)
+    post.content = data.get('content', post.content)
+    post.user_id = data.get('user_id', post.user_id)
+    db.session.commit()
+    return jsonify(post.serialize()), 200
+
+# Eliminar un post por ID
+@app.route('/posts/<int:post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    post = Post.query.get(post_id)
+    if post is None:
+        return jsonify({"error": "Post not found"}), 404
+    db.session.delete(post)
+    db.session.commit()
+    return jsonify({"message": "Post deleted"}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
