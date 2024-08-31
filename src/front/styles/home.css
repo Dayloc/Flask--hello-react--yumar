@@ -5,3 +5,26 @@
     one more css for each page that will contain the selected used 
     on that page only (the ones not reused in other pages).
 */
+/* Asegúrate de que el contenedor centralice el contenido */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Centra la tarjeta horizontalmente */
+.card {
+    margin-bottom: 20px;
+}
+
+/* Centra las listas */
+.list-group {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Estilo opcional para mejorar la apariencia de las listas */
+.list-group-item {
+    text-align: center;
+}
