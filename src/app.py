@@ -12,6 +12,7 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from api.models import Post
 from api.models import User
+from flask_cors import CORS
 
 # from models import Person
 
@@ -19,6 +20,7 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
+CORS(app)
 app.url_map.strict_slashes = False
 
 # database condiguration
@@ -141,6 +143,10 @@ def handle_delete_user(id):
         if user is None:
             return jsonify({"error": "User not found"}), 404
         
+        #Eliminar post asociados ma este id(""MUY IMPORTANTE"")
+        
+        Post.query.filter_by(user_id=id).delete()  
+             
         # Eliminar el usuario de la base de datos
         db.session.delete(user)
         db.session.commit()
@@ -167,6 +173,7 @@ def get_posts():
     return jsonify([post.serialize() for post in posts]), 200
 
 # Obtener un post por ID
+
 @app.route('/posts/<int:post_id>', methods=['GET'])
 def get_post(post_id):
     post = Post.query.get(post_id)
@@ -174,7 +181,9 @@ def get_post(post_id):
         return jsonify({"error": "Post not found"}), 404
     return jsonify(post.serialize()), 200
 
+
 # Actualizar un post por ID
+
 @app.route('/posts/<int:post_id>', methods=['PUT'])
 def update_post(post_id):
     post = Post.query.get(post_id)
@@ -188,6 +197,7 @@ def update_post(post_id):
     return jsonify(post.serialize()), 200
 
 # Eliminar un post por ID
+
 @app.route('/posts/<int:post_id>', methods=['DELETE'])
 def delete_post(post_id):
     post = Post.query.get(post_id)
@@ -196,6 +206,18 @@ def delete_post(post_id):
     db.session.delete(post)
     db.session.commit()
     return jsonify({"message": "Post deleted"}), 200
+
+#Trayendo todos los pos de un usuario
+
+@app.route('/users/<int:user_id>/posts', methods=['GET'])
+def get_posts_by_user(user_id):
+    # Obtén todos los posts que pertenecen al usuario con user_id
+    posts = Post.query.filter_by(user_id=user_id).all()
+    
+    if not posts:
+        return jsonify({"error": "No posts found for this user"}), 404
+    
+    return jsonify([post.serialize() for post in posts]), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
