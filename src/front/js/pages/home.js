@@ -47,15 +47,15 @@ export const Home = () => {
             </div>
             
             {/* Publicaciones */}
-            <div className="mt-4">
+            <div className="mt-4 ">
                 <h2>Publicaciones</h2>
                 {store.post.length > 0 ? (
-                    <ul className="list-group mx-auto bg-gradient" style={{ maxWidth: '600px' }}>
+                    <ul className="list-group  mx-auto " style={{ maxWidth: '600px' }}>
                         {store.post.map(post => (
-                            <li key={post.id} className="list-group-item">
-                                - - 
-                                <div className="card mx-auto" style={{ width: '18rem' }}>
-                <div className="card-body">
+                            <li key={post.id} className="list-group-item bg-dark post mt-4 rounded ">
+                              
+                                <div className="card mx-auto " style={{ width: '18rem' }}>
+                <div className="card-body  ">
                     <h5 className="card-title">{post.title} </h5>
                     <h6 className="card-subtitle mb-2 text-body-secondary">{post.user_id}</h6>
                     <p className="card-text"> {post.content}</p>
